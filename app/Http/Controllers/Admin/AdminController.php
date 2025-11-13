@@ -12,7 +12,9 @@ use App\Models\User;
 use App\Models\Opportunity;
 use App\Notifications\ProfileApproved;
 use App\Notifications\ProfileRejected;
+use App\Notifications\NewOpportunityNotification;
 use App\Services\AuditService;
+use Illuminate\Support\Facades\Notification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -673,7 +675,7 @@ class AdminController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        Opportunity::create($validated);
+        $opportunity = Opportunity::create($validated);
 
         AuditService::log(
             'Opportunity Created',
@@ -681,8 +683,26 @@ class AdminController extends Controller
             Opportunity::class
         );
 
+        // Send email notifications to verified PLWD members with verified email
+        if ($opportunity->status === 'active') {
+            $verifiedUsers = User::where('role', 'plwd')
+                ->whereNotNull('email_verified_at')
+                ->whereHas('plwdProfile', function($query) {
+                    $query->where('verified', true);
+                })
+                ->get();
+
+            Notification::send($verifiedUsers, new NewOpportunityNotification($opportunity));
+
+            AuditService::log(
+                'Opportunity Notifications Sent',
+                "Sent notifications to {$verifiedUsers->count()} verified PLWD members for opportunity: {$validated['title']}",
+                Opportunity::class
+            );
+        }
+
         return redirect()->route('admin.opportunities')
-            ->with('success', 'Opportunity created successfully!');
+            ->with('success', 'Opportunity created successfully! ' . ($opportunity->status === 'active' ? 'Email notifications sent to verified members.' : ''));
     }
 
     /**
@@ -700,6 +720,7 @@ class AdminController extends Controller
     public function updateOpportunity(Request $request, $id)
     {
         $opportunity = Opportunity::findOrFail($id);
+        $wasInactive = $opportunity->status !== 'active';
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -722,6 +743,28 @@ class AdminController extends Controller
             Opportunity::class,
             $id
         );
+
+        // Send notifications if opportunity status changed to active
+        if ($wasInactive && $validated['status'] === 'active') {
+            $verifiedUsers = User::where('role', 'plwd')
+                ->whereNotNull('email_verified_at')
+                ->whereHas('plwdProfile', function($query) {
+                    $query->where('verified', true);
+                })
+                ->get();
+
+            Notification::send($verifiedUsers, new NewOpportunityNotification($opportunity));
+
+            AuditService::log(
+                'Opportunity Notifications Sent',
+                "Sent notifications to {$verifiedUsers->count()} verified PLWD members for opportunity: {$opportunity->title}",
+                Opportunity::class,
+                $id
+            );
+
+            return redirect()->route('admin.opportunities')
+                ->with('success', 'Opportunity updated successfully! Email notifications sent to verified members.');
+        }
 
         return redirect()->route('admin.opportunities')
             ->with('success', 'Opportunity updated successfully!');
