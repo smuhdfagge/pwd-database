@@ -19,13 +19,13 @@
             </a>
             <hr class="text-white">
             <!-- Configure Menu with Submenu -->
-            <a class="nav-link {{ request()->routeIs('admin.disability-types') || request()->routeIs('admin.education-levels') || request()->routeIs('admin.skills') ? 'active' : '' }}" 
+            <a class="nav-link {{ request()->routeIs('admin.disability-types') || request()->routeIs('admin.education-levels') || request()->routeIs('admin.skills') || request()->routeIs('admin.opportunities*') ? 'active' : '' }}" 
                href="javascript:void(0);" 
                onclick="toggleSubmenu(event)">
                 <i class="fas fa-cog"></i> Configure
                 <i class="fas fa-chevron-down dropdown-arrow"></i>
             </a>
-            <div class="submenu {{ request()->routeIs('admin.disability-types') || request()->routeIs('admin.education-levels') || request()->routeIs('admin.skills') ? 'show' : '' }}">
+            <div class="submenu {{ request()->routeIs('admin.disability-types') || request()->routeIs('admin.education-levels') || request()->routeIs('admin.skills') || request()->routeIs('admin.opportunities*') ? 'show' : '' }}">
                 <a class="nav-link {{ request()->routeIs('admin.disability-types') ? 'active' : '' }}" href="{{ route('admin.disability-types') }}">
                     <i class="fas fa-list"></i> Disability Types
                 </a>
@@ -34,6 +34,9 @@
                 </a>
                 <a class="nav-link {{ request()->routeIs('admin.skills') ? 'active' : '' }}" href="{{ route('admin.skills') }}">
                     <i class="fas fa-tools"></i> Skills
+                </a>
+                <a class="nav-link {{ request()->routeIs('admin.opportunities*') ? 'active' : '' }}" href="{{ route('admin.opportunities') }}">
+                    <i class="fas fa-briefcase"></i> Opportunities
                 </a>
             </div>
             

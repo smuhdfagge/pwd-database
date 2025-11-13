@@ -11,6 +11,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Opportunities route (requires authentication)
 Route::get('/opportunities', [OpportunityController::class, 'index'])->name('opportunities.index');
+Route::get('/opportunities/{id}', [OpportunityController::class, 'show'])->name('opportunities.show');
 
 // Authentication routes (will be added by Breeze)
 require __DIR__.'/auth.php';
@@ -28,8 +29,10 @@ Route::middleware(['auth', 'verified', 'role:plwd'])->prefix('plwd')->name('plwd
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/download-pdf', [ProfileController::class, 'downloadPdf'])->name('profile.download-pdf');
     Route::post('/documents/upload', [ProfileController::class, 'uploadDocument'])->name('documents.upload');
     Route::delete('/documents/{id}', [ProfileController::class, 'deleteDocument'])->name('documents.delete');
+    Route::delete('/education-records/{id}', [ProfileController::class, 'deleteEducationRecord'])->name('education-records.delete');
 });
 
 // Admin routes
@@ -74,5 +77,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/skills', [AdminController::class, 'storeSkill'])->name('skills.store');
     Route::put('/skills/{id}', [AdminController::class, 'updateSkill'])->name('skills.update');
     Route::delete('/skills/{id}', [AdminController::class, 'destroySkill'])->name('skills.destroy');
+    
+    // Opportunities Management
+    Route::get('/opportunities', [AdminController::class, 'manageOpportunities'])->name('opportunities');
+    Route::get('/opportunities/create', [AdminController::class, 'createOpportunity'])->name('opportunities.create');
+    Route::post('/opportunities', [AdminController::class, 'storeOpportunity'])->name('opportunities.store');
+    Route::get('/opportunities/{id}/edit', [AdminController::class, 'editOpportunity'])->name('opportunities.edit');
+    Route::put('/opportunities/{id}', [AdminController::class, 'updateOpportunity'])->name('opportunities.update');
+    Route::delete('/opportunities/{id}', [AdminController::class, 'destroyOpportunity'])->name('opportunities.destroy');
 });
 

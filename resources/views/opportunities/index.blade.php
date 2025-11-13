@@ -29,24 +29,20 @@
                 <div class="card-body">
                     <form method="GET" action="{{ route('opportunities.index') }}">
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="search" class="form-label">Search</label>
                                 <input type="text" class="form-control" id="search" name="search" 
-                                       placeholder="Job title or keyword..." value="{{ request('search') }}">
+                                       placeholder="Title or keyword..." value="{{ request('search') }}">
                             </div>
-                            <div class="col-md-3">
-                                <label for="location" class="form-label">Location</label>
-                                <input type="text" class="form-control" id="location" name="location" 
-                                       placeholder="State or city..." value="{{ request('location') }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="type" class="form-label">Job Type</label>
+                            <div class="col-md-4">
+                                <label for="type" class="form-label">Type</label>
                                 <select class="form-select" id="type" name="type">
                                     <option value="">All Types</option>
-                                    <option value="full-time" {{ request('type') == 'full-time' ? 'selected' : '' }}>Full Time</option>
-                                    <option value="part-time" {{ request('type') == 'part-time' ? 'selected' : '' }}>Part Time</option>
-                                    <option value="contract" {{ request('type') == 'contract' ? 'selected' : '' }}>Contract</option>
-                                    <option value="internship" {{ request('type') == 'internship' ? 'selected' : '' }}>Internship</option>
+                                    <option value="employment" {{ request('type') == 'employment' ? 'selected' : '' }}>Employment</option>
+                                    <option value="training" {{ request('type') == 'training' ? 'selected' : '' }}>Training</option>
+                                    <option value="volunteer" {{ request('type') == 'volunteer' ? 'selected' : '' }}>Volunteer</option>
+                                    <option value="scholarship" {{ request('type') == 'scholarship' ? 'selected' : '' }}>Scholarship</option>
+                                    <option value="other" {{ request('type') == 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
@@ -61,37 +57,48 @@
             </div>
 
             <!-- Opportunities List -->
-            @if(count($opportunities) > 0)
+            @if($opportunities->count() > 0)
                 @foreach($opportunities as $opportunity)
                     <div class="card mb-3 shadow-sm">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-2 text-center">
                                     <div class="bg-light rounded p-3">
-                                        <i class="fas fa-building fa-3x text-primary"></i>
+                                        <i class="fas fa-briefcase fa-3x text-primary"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
-                                    <h5 class="card-title">{{ $opportunity['title'] }}</h5>
-                                    <p class="text-muted mb-2">
-                                        <i class="fas fa-building"></i> {{ $opportunity['company'] }}
-                                    </p>
-                                    <p class="mb-2">{{ $opportunity['description'] }}</p>
+                                    <h5 class="card-title">{{ $opportunity->title }}</h5>
+                                    @if($opportunity->organization)
+                                        <p class="text-muted mb-2">
+                                            <i class="fas fa-building"></i> {{ $opportunity->organization }}
+                                        </p>
+                                    @endif
+                                    <div class="mb-2">
+                                        {{ Str::limit($opportunity->description, 200) }}
+                                    </div>
                                     <div class="d-flex gap-2 flex-wrap">
-                                        <span class="badge bg-primary">
-                                            <i class="fas fa-map-marker-alt"></i> {{ $opportunity['location'] }}
-                                        </span>
+                                        @if($opportunity->location)
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-map-marker-alt"></i> {{ $opportunity->location }}
+                                            </span>
+                                        @endif
                                         <span class="badge bg-info">
-                                            <i class="fas fa-clock"></i> {{ $opportunity['type'] }}
+                                            <i class="fas fa-tag"></i> {{ ucfirst($opportunity->type) }}
                                         </span>
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-dollar-sign"></i> {{ $opportunity['salary'] }}
+                                        @if($opportunity->deadline)
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-calendar"></i> Deadline: {{ $opportunity->deadline->format('M d, Y') }}
+                                            </span>
+                                        @endif
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-eye"></i> {{ $opportunity->views }} views
                                         </span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 text-end">
-                                    <small class="text-muted d-block mb-2">Posted {{ $opportunity['posted_date'] }}</small>
-                                    <a href="#" class="btn btn-primary btn-sm w-100">
+                                    <small class="text-muted d-block mb-2">Posted {{ $opportunity->created_at->diffForHumans() }}</small>
+                                    <a href="{{ route('opportunities.show', $opportunity->id) }}" class="btn btn-primary btn-sm w-100">
                                         <i class="fas fa-external-link-alt"></i> View Details
                                     </a>
                                 </div>
@@ -100,9 +107,9 @@
                     </div>
                 @endforeach
 
-                <!-- Pagination would go here -->
+                <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
-                    {{-- Pagination links will be added when implementing real data --}}
+                    {{ $opportunities->links() }}
                 </div>
             @else
                 <!-- No Opportunities Found -->

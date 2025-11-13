@@ -135,7 +135,7 @@
 
                             <!-- Education Level -->
                             <div class="col-md-6 mb-3">
-                                <label for="education_level_id" class="form-label">Education Level *</label>
+                                <label for="education_level_id" class="form-label">Highest Education Level *</label>
                                 <select name="education_level_id" id="education_level_id" class="form-select" required>
                                     <option value="">Select Education Level</option>
                                     @foreach($educationLevels as $level)
@@ -160,6 +160,90 @@
                                         </div>
                                     @endforeach
                                 </div>
+                            </div>
+
+                            <!-- Educational Information Section -->
+                            <div class="col-md-12 mb-4">
+                                <hr class="my-4">
+                                <h5 class="mb-3"><i class="fas fa-graduation-cap"></i> Educational Information</h5>
+                                <p class="text-muted small mb-3">Add your educational background and qualifications</p>
+                                
+                                <div id="education-records-container">
+                                    @if($educationRecords && $educationRecords->count() > 0)
+                                        @foreach($educationRecords as $index => $record)
+                                            <div class="education-record-item card mb-3" data-index="{{ $index }}">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h6 class="mb-0">Education Record #{{ $index + 1 }}</h6>
+                                                        <button type="button" class="btn btn-sm btn-danger remove-education-record" data-id="{{ $record->id }}">
+                                                            <i class="fas fa-trash"></i> Remove
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <input type="hidden" name="education_records[{{ $index }}][id]" value="{{ $record->id }}">
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Education Level</label>
+                                                            <select name="education_records[{{ $index }}][education_level_id]" class="form-select">
+                                                                <option value="">Select Education Level</option>
+                                                                @foreach($educationLevels as $level)
+                                                                    <option value="{{ $level->id }}" {{ $record->education_level_id == $level->id ? 'selected' : '' }}>
+                                                                        {{ $level->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Institution</label>
+                                                            <input type="text" name="education_records[{{ $index }}][institution]" class="form-control" 
+                                                                   value="{{ old('education_records.'.$index.'.institution', $record->institution) }}" 
+                                                                   placeholder="e.g., University of Lagos">
+                                                        </div>
+                                                        
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="form-label">From Year</label>
+                                                            <input type="number" name="education_records[{{ $index }}][from_year]" class="form-control" 
+                                                                   value="{{ old('education_records.'.$index.'.from_year', $record->from_year) }}" 
+                                                                   placeholder="e.g., 2015" min="1950" max="{{ date('Y') }}">
+                                                        </div>
+                                                        
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="form-label">To Year</label>
+                                                            <input type="number" name="education_records[{{ $index }}][to_year]" class="form-control" 
+                                                                   value="{{ old('education_records.'.$index.'.to_year', $record->to_year) }}" 
+                                                                   placeholder="e.g., 2019" min="1950" max="{{ date('Y') + 10 }}">
+                                                        </div>
+                                                        
+                                                        <div class="col-md-6 mb-3">
+                                                            <label class="form-label">Certificate Obtained</label>
+                                                            <input type="text" name="education_records[{{ $index }}][certificate_obtained]" class="form-control" 
+                                                                   value="{{ old('education_records.'.$index.'.certificate_obtained', $record->certificate_obtained) }}" 
+                                                                   placeholder="e.g., Bachelor of Science">
+                                                        </div>
+                                                        
+                                                        <div class="col-md-12 mb-3">
+                                                            <label class="form-label">Upload Certificate/Document</label>
+                                                            <input type="file" name="education_records[{{ $index }}][document]" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                                            @if($record->document_path)
+                                                                <small class="text-success d-block mt-1">
+                                                                    <i class="fas fa-check-circle"></i> Document uploaded: 
+                                                                    <a href="{{ asset('storage/' . $record->document_path) }}" target="_blank">View</a>
+                                                                </small>
+                                                            @endif
+                                                            <small class="text-muted d-block">Accepted formats: PDF, JPG, PNG (Max: 5MB)</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                
+                                <button type="button" class="btn btn-outline-primary" id="add-education-record">
+                                    <i class="fas fa-plus"></i> Add Education Record
+                                </button>
                             </div>
 
                             <!-- Bio -->
@@ -196,3 +280,121 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let educationRecordIndex = {{ $educationRecords ? $educationRecords->count() : 0 }};
+    
+    // Add new education record
+    document.getElementById('add-education-record').addEventListener('click', function() {
+        const container = document.getElementById('education-records-container');
+        const newRecord = `
+            <div class="education-record-item card mb-3" data-index="${educationRecordIndex}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Education Record #${educationRecordIndex + 1}</h6>
+                        <button type="button" class="btn btn-sm btn-danger remove-education-record-new">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Education Level</label>
+                            <select name="education_records[${educationRecordIndex}][education_level_id]" class="form-select">
+                                <option value="">Select Education Level</option>
+                                @foreach($educationLevels as $level)
+                                    <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Institution</label>
+                            <input type="text" name="education_records[${educationRecordIndex}][institution]" class="form-control" 
+                                   placeholder="e.g., University of Lagos">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">From Year</label>
+                            <input type="number" name="education_records[${educationRecordIndex}][from_year]" class="form-control" 
+                                   placeholder="e.g., 2015" min="1950" max="{{ date('Y') }}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">To Year</label>
+                            <input type="number" name="education_records[${educationRecordIndex}][to_year]" class="form-control" 
+                                   placeholder="e.g., 2019" min="1950" max="{{ date('Y') + 10 }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Certificate Obtained</label>
+                            <input type="text" name="education_records[${educationRecordIndex}][certificate_obtained]" class="form-control" 
+                                   placeholder="e.g., Bachelor of Science">
+                        </div>
+                        
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Upload Certificate/Document</label>
+                            <input type="file" name="education_records[${educationRecordIndex}][document]" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                            <small class="text-muted d-block">Accepted formats: PDF, JPG, PNG (Max: 5MB)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', newRecord);
+        educationRecordIndex++;
+    });
+    
+    // Remove new education record (not yet saved)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-education-record-new') || 
+            e.target.closest('.remove-education-record-new')) {
+            const button = e.target.classList.contains('remove-education-record-new') ? 
+                          e.target : e.target.closest('.remove-education-record-new');
+            const recordItem = button.closest('.education-record-item');
+            if (confirm('Are you sure you want to remove this education record?')) {
+                recordItem.remove();
+            }
+        }
+    });
+    
+    // Remove existing education record (requires server request)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-education-record') || 
+            e.target.closest('.remove-education-record')) {
+            const button = e.target.classList.contains('remove-education-record') ? 
+                          e.target : e.target.closest('.remove-education-record');
+            const recordId = button.getAttribute('data-id');
+            const recordItem = button.closest('.education-record-item');
+            
+            if (confirm('Are you sure you want to delete this education record? This action cannot be undone.')) {
+                // Send delete request
+                fetch(`/plwd/education-records/${recordId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        recordItem.remove();
+                        alert('Education record deleted successfully!');
+                    } else {
+                        alert('Error deleting education record. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting education record. Please try again.');
+                });
+            }
+        }
+    });
+});
+</script>
+@endpush

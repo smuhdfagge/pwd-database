@@ -57,6 +57,11 @@ class PlwdProfile extends Model
         return $this->hasMany(Upload::class, 'plwd_id');
     }
 
+    public function educationRecords(): HasMany
+    {
+        return $this->hasMany(EducationRecord::class);
+    }
+
     public function getAgeAttribute()
     {
         return $this->date_of_birth ? $this->date_of_birth->age : null;

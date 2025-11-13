@@ -95,7 +95,106 @@
                 </div>
             </div>
 
-            <!-- Documents Card -->
+            <!-- Educational Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Educational Information</h5>
+                </div>
+                <div class="card-body">
+                    @if($profile->educationRecords && $profile->educationRecords->count() > 0)
+                        <div class="row">
+                            @foreach($profile->educationRecords as $record)
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-3">
+                                                @if($record->educationLevel)
+                                                    <i class="fas fa-certificate text-primary"></i> {{ $record->educationLevel->name }}
+                                                @else
+                                                    <i class="fas fa-certificate text-muted"></i> Education Record
+                                                @endif
+                                            </h6>
+                                            
+                                            @if($record->institution)
+                                                <p class="mb-1"><strong>Institution:</strong> {{ $record->institution }}</p>
+                                            @endif
+                                            
+                                            @if($record->from_year || $record->to_year)
+                                                <p class="mb-1">
+                                                    <strong>Period:</strong> 
+                                                    {{ $record->from_year ?? 'N/A' }} - {{ $record->to_year ?? 'Present' }}
+                                                </p>
+                                            @endif
+                                            
+                                            @if($record->certificate_obtained)
+                                                <p class="mb-1"><strong>Certificate:</strong> {{ $record->certificate_obtained }}</p>
+                                            @endif
+                                            
+                                            @if($record->document_path)
+                                                <p class="mb-0 mt-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#eduDocModal{{ $record->id }}">
+                                                        <i class="fas fa-file-pdf"></i> View Document
+                                                    </button>
+                                                    <a href="{{ asset('storage/' . $record->document_path) }}" download class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Education Document Modal -->
+                                @if($record->document_path)
+                                    <div class="modal fade" id="eduDocModal{{ $record->id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="fas fa-graduation-cap"></i> 
+                                                        {{ $record->certificate_obtained ?? 'Education Document' }}
+                                                        @if($record->institution)
+                                                            - {{ $record->institution }}
+                                                        @endif
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    @php
+                                                        $extension = strtolower(pathinfo($record->document_path, PATHINFO_EXTENSION));
+                                                    @endphp
+                                                    
+                                                    @if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                        <img src="{{ asset('storage/' . $record->document_path) }}" class="img-fluid" alt="Education Certificate">
+                                                    @elseif($extension == 'pdf')
+                                                        <iframe src="{{ asset('storage/' . $record->document_path) }}" style="width: 100%; height: 600px;" frameborder="0"></iframe>
+                                                    @else
+                                                        <p class="text-center">
+                                                            <i class="fas fa-file fa-3x mb-3"></i><br>
+                                                            Preview not available for this file type.<br>
+                                                            <a href="{{ asset('storage/' . $record->document_path) }}" download class="btn btn-primary mt-3">
+                                                                <i class="fas fa-download"></i> Download File
+                                                            </a>
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="{{ asset('storage/' . $record->document_path) }}" download class="btn btn-primary">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted">No educational records added yet.</p>
+                    @endif
+                </div>
+            </div>
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-file"></i> Uploaded Documents ({{ $profile->uploads->count() }})</h5>

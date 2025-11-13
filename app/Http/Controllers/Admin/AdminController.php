@@ -9,6 +9,7 @@ use App\Models\EducationLevel;
 use App\Models\PlwdProfile;
 use App\Models\Skill;
 use App\Models\User;
+use App\Models\Opportunity;
 use App\Notifications\ProfileApproved;
 use App\Notifications\ProfileRejected;
 use App\Services\AuditService;
@@ -168,7 +169,7 @@ class AdminController extends Controller
      */
     public function show($id)
     {
-        $profile = PlwdProfile::with(['user', 'disabilityType', 'educationLevel', 'uploads'])
+        $profile = PlwdProfile::with(['user', 'disabilityType', 'educationLevel', 'uploads', 'educationRecords.educationLevel'])
             ->findOrFail($id);
 
         return view('admin.plwds.show', compact('profile'));
@@ -636,4 +637,113 @@ class AdminController extends Controller
         return redirect()->route('admin.settings')
             ->with('success', 'Settings updated successfully.');
     }
+
+    /**
+     * Display list of opportunities
+     */
+    public function manageOpportunities()
+    {
+        $opportunities = Opportunity::orderBy('created_at', 'desc')->paginate(15);
+        return view('admin.opportunities.index', compact('opportunities'));
+    }
+
+    /**
+     * Show form to create new opportunity
+     */
+    public function createOpportunity()
+    {
+        return view('admin.opportunities.create');
+    }
+
+    /**
+     * Store new opportunity
+     */
+    public function storeOpportunity(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'nullable|string|max:255',
+            'organization' => 'nullable|string|max:255',
+            'type' => 'required|string|in:employment,training,volunteer,scholarship,other',
+            'deadline' => 'nullable|date',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_phone' => 'nullable|string|max:20',
+            'website_url' => 'nullable|url|max:255',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        Opportunity::create($validated);
+
+        AuditService::log(
+            'Opportunity Created',
+            "Created opportunity: {$validated['title']}",
+            Opportunity::class
+        );
+
+        return redirect()->route('admin.opportunities')
+            ->with('success', 'Opportunity created successfully!');
+    }
+
+    /**
+     * Show form to edit opportunity
+     */
+    public function editOpportunity($id)
+    {
+        $opportunity = Opportunity::findOrFail($id);
+        return view('admin.opportunities.edit', compact('opportunity'));
+    }
+
+    /**
+     * Update opportunity
+     */
+    public function updateOpportunity(Request $request, $id)
+    {
+        $opportunity = Opportunity::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'nullable|string|max:255',
+            'organization' => 'nullable|string|max:255',
+            'type' => 'required|string|in:employment,training,volunteer,scholarship,other',
+            'deadline' => 'nullable|date',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_phone' => 'nullable|string|max:20',
+            'website_url' => 'nullable|url|max:255',
+            'status' => 'required|in:active,inactive,expired',
+        ]);
+
+        $opportunity->update($validated);
+
+        AuditService::log(
+            'Opportunity Updated',
+            "Updated opportunity: {$opportunity->title}",
+            Opportunity::class,
+            $id
+        );
+
+        return redirect()->route('admin.opportunities')
+            ->with('success', 'Opportunity updated successfully!');
+    }
+
+    /**
+     * Delete opportunity
+     */
+    public function destroyOpportunity($id)
+    {
+        $opportunity = Opportunity::findOrFail($id);
+        $title = $opportunity->title;
+        $opportunity->delete();
+
+        AuditService::log(
+            'Opportunity Deleted',
+            "Deleted opportunity: {$title}",
+            Opportunity::class,
+            $id
+        );
+
+        return redirect()->back()->with('success', 'Opportunity deleted successfully!');
+    }
 }
+
