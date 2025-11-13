@@ -24,7 +24,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 // PLWD routes
-Route::middleware(['auth', 'role:plwd'])->prefix('plwd')->name('plwd.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:plwd'])->prefix('plwd')->name('plwd.')->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
