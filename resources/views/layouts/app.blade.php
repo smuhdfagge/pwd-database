@@ -54,18 +54,64 @@
                 position: fixed;
                 top: 56px;
                 bottom: 0;
-                left: 0;
-                z-index: 100;
+                left: -100%;
+                z-index: 1050;
                 padding: 0;
-                box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
                 background: linear-gradient(180deg, var(--dark-bg) 0%, #343a40 100%);
                 overflow-y: auto;
+                width: 280px;
+                transition: left 0.3s ease-in-out;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                display: none;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+            
+            .sidebar-toggle {
+                position: fixed;
+                top: 65px;
+                left: 10px;
+                z-index: 1030;
+                background-color: var(--primary-green);
+                border: none;
+                border-radius: 5px;
+                padding: 8px 12px;
+                color: white;
+                cursor: pointer;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+            
+            .sidebar-toggle:hover {
+                background-color: #218838;
             }
             
             /* Add left margin to main content when sidebar is visible */
             @media (min-width: 768px) {
                 .sidebar {
+                    left: 0;
                     width: 25%; /* col-md-3 */
+                }
+                .sidebar-toggle {
+                    display: none;
+                }
+                .sidebar-overlay {
+                    display: none !important;
                 }
                 .main-content-with-sidebar {
                     margin-left: 25% !important;
@@ -197,6 +243,14 @@
         <main>
             @auth
                 @if(Auth::user()->role === 'admin' || Auth::user()->role === 'plwd')
+                    <!-- Sidebar Toggle Button (Mobile Only) -->
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <!-- Sidebar Overlay (Mobile Only) -->
+                    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+                    
                     <div class="container-fluid">
                         <div class="row">
                             @if(Auth::user()->role === 'admin')
@@ -220,6 +274,40 @@
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Sidebar Toggle Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                const sidebar = document.querySelector('.sidebar');
+                const sidebarOverlay = document.getElementById('sidebarOverlay');
+                
+                if (sidebarToggle && sidebar && sidebarOverlay) {
+                    // Toggle sidebar on button click
+                    sidebarToggle.addEventListener('click', function() {
+                        sidebar.classList.toggle('show');
+                        sidebarOverlay.classList.toggle('show');
+                    });
+                    
+                    // Close sidebar when clicking on overlay
+                    sidebarOverlay.addEventListener('click', function() {
+                        sidebar.classList.remove('show');
+                        sidebarOverlay.classList.remove('show');
+                    });
+                    
+                    // Close sidebar when clicking on a link (mobile only)
+                    const sidebarLinks = sidebar.querySelectorAll('.nav-link');
+                    sidebarLinks.forEach(link => {
+                        link.addEventListener('click', function() {
+                            if (window.innerWidth < 768) {
+                                sidebar.classList.remove('show');
+                                sidebarOverlay.classList.remove('show');
+                            }
+                        });
+                    });
+                }
+            });
+        </script>
         
         @yield('scripts')
         @stack('scripts')
