@@ -4,7 +4,7 @@
             <!-- Left Column: Branding & Welcome Message -->
             <div class="col-lg-5 auth-brand d-none d-lg-flex flex-column justify-content-center p-5">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo" class="img-fluid mb-3" style="max-width: 150px;">
+                    <img src="{{ asset('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo" class="img-fluid mb-3 mx-auto d-block" style="max-width: 150px;">
                     <h3 class="fw-bold">Welcome Back!</h3>
                     <p class="mb-0">V-PeSDI PLWDs Database</p>
                 </div>
