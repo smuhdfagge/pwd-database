@@ -121,8 +121,6 @@ CREATE TABLE `plwd_profiles` (
   `bio` text DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT 0,
   `photo` varchar(255) DEFAULT NULL,
-  `latitude` decimal(10,8) DEFAULT NULL,
-  `longitude` decimal(11,8) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -138,7 +136,6 @@ CREATE TABLE `plwd_profiles` (
   KEY `plwd_profiles_state_disability_type_id_index` (`state`, `disability_type_id`),
   KEY `plwd_profiles_created_at_index` (`created_at`),
   KEY `plwd_profiles_updated_at_index` (`updated_at`),
-  KEY `plwd_profiles_latitude_longitude_index` (`latitude`, `longitude`),
   CONSTRAINT `plwd_profiles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `plwd_profiles_disability_type_id_foreign` FOREIGN KEY (`disability_type_id`) REFERENCES `disability_types` (`id`) ON DELETE SET NULL,
   CONSTRAINT `plwd_profiles_education_level_id_foreign` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL

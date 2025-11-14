@@ -330,9 +330,28 @@ class AdminController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        AuditService::log('Data Export', 'Exported PLWD data to Excel');
+        // Prepare filter information for audit log
+        $filters = [];
+        if ($request->filled('state')) {
+            $filters[] = "State: " . $request->state;
+        }
+        if ($request->filled('disability_type')) {
+            $disabilityType = DisabilityType::find($request->disability_type);
+            $filters[] = "Disability Type: " . ($disabilityType ? $disabilityType->name : 'Unknown');
+        }
+        if ($request->filled('gender')) {
+            $filters[] = "Gender: " . $request->gender;
+        }
+        if ($request->filled('verified') && $request->verified !== '') {
+            $filters[] = "Status: " . ($request->verified == '1' ? 'Verified' : 'Pending');
+        }
+        if ($request->filled('search')) {
+            $filters[] = "Search: " . $request->search;
+        }
 
-        return Excel::download(new PlwdExport($request->all()), 'plwds_' . date('Y-m-d') . '.xlsx');
+        AuditService::log('Data Export', 'Exported PLWD data to Excel' . (count($filters) > 0 ? ' with filters: ' . implode(', ', $filters) : ''));
+
+        return Excel::download(new PlwdExport($request->all()), 'plwds_' . date('Y-m-d_His') . '.xlsx');
     }
 
     /**
@@ -351,12 +370,47 @@ class AdminController extends Controller
             $query->where('disability_type_id', $request->disability_type);
         }
 
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
+
+        if ($request->filled('verified') && $request->verified !== '') {
+            $query->where('verified', $request->verified);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
         $plwds = $query->get();
 
-        AuditService::log('Data Export', 'Exported PLWD data to PDF');
+        // Prepare filter information for display
+        $filters = [];
+        if ($request->filled('state')) {
+            $filters[] = "State: " . $request->state;
+        }
+        if ($request->filled('disability_type')) {
+            $disabilityType = DisabilityType::find($request->disability_type);
+            $filters[] = "Disability Type: " . ($disabilityType ? $disabilityType->name : 'Unknown');
+        }
+        if ($request->filled('gender')) {
+            $filters[] = "Gender: " . $request->gender;
+        }
+        if ($request->filled('verified') && $request->verified !== '') {
+            $filters[] = "Status: " . ($request->verified == '1' ? 'Verified' : 'Pending');
+        }
+        if ($request->filled('search')) {
+            $filters[] = "Search: " . $request->search;
+        }
 
-        $pdf = Pdf::loadView('admin.reports.pdf', compact('plwds'));
-        return $pdf->download('plwds_' . date('Y-m-d') . '.pdf');
+        AuditService::log('Data Export', 'Exported PLWD data to PDF' . (count($filters) > 0 ? ' with filters: ' . implode(', ', $filters) : ''));
+
+        $pdf = Pdf::loadView('admin.reports.pdf', compact('plwds', 'filters'));
+        return $pdf->download('plwds_' . date('Y-m-d_His') . '.pdf');
     }
 
     /**

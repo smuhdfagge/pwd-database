@@ -3,9 +3,14 @@
 <head>
     <title>PLWDs Report</title>
     <style>
+        @page {
+            margin: 100px 50px 80px 50px;
+        }
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
+            margin: 0;
+            padding: 0;
         }
         h1 {
             color: #28a745;
@@ -16,6 +21,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            margin-bottom: 100px; /* Add space for footer */
         }
         th {
             background-color: #28a745;
@@ -36,10 +42,19 @@
             margin-bottom: 30px;
         }
         .footer {
-            margin-top: 30px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             text-align: center;
             font-size: 10px;
             color: #666;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+            background-color: white;
+        }
+        .footer p {
+            margin: 2px 0;
         }
     </style>
 </head>
@@ -47,7 +62,7 @@
     <div class="header">
         <h1>V-PeSDI PLWDs Database Report</h1>
         <p>Generated on: {{ date('d F Y, H:i A') }}</p>
-        <p>Total Records: {{ $plwds->count() }}</p>
+        <p><strong>Total Records: {{ $plwds->count() }}</strong></p>
     </div>
 
     <table>

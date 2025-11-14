@@ -32,7 +32,34 @@
                     <div class="card stat-card">
                         <div class="card-body">
                             <h6 class="text-muted">Profile Completion</h6>
-                            <h4>{{ $profile ? '100%' : '20%' }}</h4>
+                            <h4>
+                                @if($profile)
+                                    {{ $profile->profile_completion }}%
+                                    @if($profile->profile_completion < 100)
+                                        <small class="text-muted" style="font-size: 0.8rem;">
+                                            ({{ $profile->completed_required_fields }}/{{ $profile->total_required_fields }} required fields)
+                                        </small>
+                                    @endif
+                                @else
+                                    0%
+                                @endif
+                            </h4>
+                            @if($profile && $profile->profile_completion < 100)
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar 
+                                        @if($profile->profile_completion >= 80) bg-success
+                                        @elseif($profile->profile_completion >= 50) bg-info
+                                        @elseif($profile->profile_completion >= 30) bg-warning
+                                        @else bg-danger
+                                        @endif" 
+                                        role="progressbar" 
+                                        style="width: {{ $profile->profile_completion }}%;" 
+                                        aria-valuenow="{{ $profile->profile_completion }}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -51,6 +78,28 @@
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Action Required:</strong> Please complete your profile to get verified.
                     <a href="{{ route('plwd.profile.edit') }}" class="alert-link">Complete Profile Now</a>
+                </div>
+            @elseif($profile && !$profile->is_complete)
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Profile Incomplete:</strong> 
+                    You have completed {{ $profile->completed_required_fields }} out of {{ $profile->total_required_fields }} required fields 
+                    ({{ $profile->profile_completion }}% complete).
+                    
+                    @if(count($profile->missing_required_fields) > 0)
+                        <br><small class="mt-2">
+                            <strong>Missing required fields:</strong> {{ implode(', ', $profile->missing_required_fields) }}
+                        </small>
+                    @endif
+                    
+                    @if(count($profile->missing_optional_fields) > 0)
+                        <br><small>
+                            <strong>Enhance your profile with:</strong> {{ implode(', ', $profile->missing_optional_fields) }}
+                        </small>
+                    @endif
+                    
+                    <br>
+                    <a href="{{ route('plwd.profile.edit') }}" class="alert-link">Complete Your Profile</a>
                 </div>
             @endif
 

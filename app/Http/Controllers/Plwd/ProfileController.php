@@ -80,8 +80,6 @@ class ProfileController extends Controller
             'skills' => 'nullable|array',
             'bio' => 'nullable|string|max:1000',
             'photo' => 'nullable|image|max:2048',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
             'education_records' => 'nullable|array',
             'education_records.*.id' => 'nullable|exists:education_records,id',
             'education_records.*.education_level_id' => 'nullable|exists:education_levels,id',

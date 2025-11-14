@@ -7,9 +7,37 @@
     <div class="col-12">
 <div class="card">
     <div class="card-header">
-        <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit Profile</h4>
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit Profile</h4>
+            @if($profile->exists)
+                <div class="text-end">
+                    <span class="badge 
+                        @if($profile->profile_completion >= 80) bg-success
+                        @elseif($profile->profile_completion >= 50) bg-info
+                        @elseif($profile->profile_completion >= 30) bg-warning
+                        @else bg-danger
+                        @endif" style="font-size: 1rem;">
+                        {{ $profile->profile_completion }}% Complete
+                    </span>
+                    <br>
+                    <small class="text-muted">{{ $profile->completed_required_fields }}/{{ $profile->total_required_fields }} required fields</small>
+                </div>
+            @endif
+        </div>
     </div>
     <div class="card-body">
+        @if($profile->exists && !$profile->is_complete)
+            <div class="alert alert-info mb-3">
+                <strong><i class="fas fa-info-circle"></i> Complete your profile:</strong>
+                @if(count($profile->missing_required_fields) > 0)
+                    <br><small><strong>Required:</strong> {{ implode(', ', $profile->missing_required_fields) }}</small>
+                @endif
+                @if(count($profile->missing_optional_fields) > 0)
+                    <br><small><strong>Optional:</strong> {{ implode(', ', $profile->missing_optional_fields) }}</small>
+                @endif
+            </div>
+        @endif
+        
         @if($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -251,17 +279,6 @@
                                 <label for="bio" class="form-label">Personal Bio (Optional)</label>
                                 <textarea name="bio" id="bio" class="form-control" rows="4" maxlength="1000" placeholder="Tell us about yourself...">{{ old('bio', $profile->bio) }}</textarea>
                                 <small class="text-muted">Maximum 1000 characters</small>
-                            </div>
-
-                            <!-- Geolocation (Optional) -->
-                            <div class="col-md-6 mb-3">
-                                <label for="latitude" class="form-label">Latitude (Optional)</label>
-                                <input type="number" step="any" name="latitude" id="latitude" class="form-control" value="{{ old('latitude', $profile->latitude) }}">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="longitude" class="form-label">Longitude (Optional)</label>
-                                <input type="number" step="any" name="longitude" id="longitude" class="form-control" value="{{ old('longitude', $profile->longitude) }}">
                             </div>
 
                             <!-- Buttons -->

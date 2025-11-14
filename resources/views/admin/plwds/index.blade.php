@@ -168,7 +168,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-3">
-                        {{ $plwds->links() }}
+                        {{ $plwds->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>

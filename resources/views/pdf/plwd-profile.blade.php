@@ -302,12 +302,6 @@
                 <th>Address</th>
                 <td>{{ $profile->address ?? 'Not specified' }}</td>
             </tr>
-            @if($profile->latitude && $profile->longitude)
-            <tr>
-                <th>GPS Coordinates</th>
-                <td>Latitude: {{ $profile->latitude }}, Longitude: {{ $profile->longitude }}</td>
-            </tr>
-            @endif
         </table>
 
         <!-- Disability Information -->

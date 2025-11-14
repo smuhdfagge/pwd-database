@@ -36,8 +36,16 @@ class PlwdExport implements FromCollection, WithHeadings, WithMapping
             $query->where('gender', $this->filters['gender']);
         }
 
-        if (!empty($this->filters['verified'])) {
+        if (isset($this->filters['verified']) && $this->filters['verified'] !== '') {
             $query->where('verified', $this->filters['verified']);
+        }
+
+        if (!empty($this->filters['search'])) {
+            $search = $this->filters['search'];
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
         return $query->get();
