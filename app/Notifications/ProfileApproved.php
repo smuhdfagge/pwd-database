@@ -43,7 +43,10 @@ class ProfileApproved extends Notification
             ->line('You now have full access to all features and benefits of the V-PeSDI PLWDs Database.')
             ->action('View Your Profile', url('/plwd/dashboard'))
             ->line('Thank you for registering with us!')
-            ->salutation('Best regards, V-PeSDI Team');
+            ->salutation('Best regards, V-PeSDI Team')
+            ->with([
+                'logoUrl' => asset('images/vpesdilogo.jpg')
+            ]);
     }
 
     /**

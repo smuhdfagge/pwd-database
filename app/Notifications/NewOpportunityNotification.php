@@ -61,7 +61,10 @@ class NewOpportunityNotification extends Notification
             ->line(substr($this->opportunity->description, 0, 200) . (strlen($this->opportunity->description) > 200 ? '...' : ''))
             ->action('View Full Details', $opportunityUrl)
             ->line('Don\'t miss out on this opportunity!')
-            ->salutation('Best regards, V-PeSDI Team');
+            ->salutation('Best regards, V-PeSDI Team')
+            ->with([
+                'logoUrl' => asset('images/vpesdilogo.jpg')
+            ]);
 
         return $mail;
     }

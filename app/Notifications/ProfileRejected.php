@@ -52,7 +52,10 @@ class ProfileRejected extends Notification
             ->line('Please update your profile with the correct information and resubmit for verification.')
             ->action('Update Profile', url('/plwd/profile/edit'))
             ->line('If you have any questions, please contact our support team.')
-            ->salutation('Best regards, V-PeSDI Team');
+            ->salutation('Best regards, V-PeSDI Team')
+            ->with([
+                'logoUrl' => asset('images/vpesdilogo.jpg')
+            ]);
     }
 
     /**

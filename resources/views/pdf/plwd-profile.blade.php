@@ -28,6 +28,12 @@
             color: white;
             padding: 15px 20px;
             margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .header img.logo {
+            max-width: 100px;
+            margin-bottom: 10px;
         }
 
         .header-content {
@@ -231,6 +237,7 @@
 <body>
     <!-- Header -->
     <div class="header">
+        <img src="{{ public_path('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo" class="logo">
         <div class="header-content">
             <div class="header-left">
                 <h1>V-PeSDI PLWDs Database</h1>

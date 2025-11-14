@@ -4,7 +4,7 @@
             <!-- Left Column: Branding & Benefits -->
             <div class="col-lg-5 auth-brand d-none d-lg-flex flex-column justify-content-center p-5">
                 <div class="text-center mb-4">
-                    <i class="fas fa-users fa-4x mb-3"></i>
+                    <img src="{{ asset('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo" class="img-fluid mb-3" style="max-width: 150px;">
                     <h3 class="fw-bold">V-PeSDI PLWDs Database</h3>
                     <p class="mb-0">Empowering Persons Living With Disabilities</p>
                 </div>

@@ -45,7 +45,10 @@ class WelcomeNotification extends Notification
             ->line('4. Once verified, you will have access to all benefits and programs')
             ->action('Complete Your Profile', url('/plwd/profile/edit'))
             ->line('If you have any questions, please don\'t hesitate to contact us.')
-            ->salutation('Best regards, V-PeSDI Team');
+            ->salutation('Best regards, V-PeSDI Team')
+            ->with([
+                'logoUrl' => asset('images/vpesdilogo.jpg')
+            ]);
     }
 
     /**

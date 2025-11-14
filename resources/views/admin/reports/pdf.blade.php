@@ -41,6 +41,10 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .header img {
+            max-width: 120px;
+            margin-bottom: 10px;
+        }
         .footer {
             position: fixed;
             bottom: 0;
@@ -60,6 +64,7 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo">
         <h1>V-PeSDI PLWDs Database Report</h1>
         <p>Generated on: {{ date('d F Y, H:i A') }}</p>
         <p><strong>Total Records: {{ $plwds->count() }}</strong></p>

@@ -7,6 +7,9 @@
 
         <title>@yield('title', config('app.name', 'V-PeSDI PLWDs Database'))</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/jpeg" href="{{ asset('images/vpesdilogo.jpg') }}">
+
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         
@@ -203,8 +206,9 @@
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ route('dashboard') }}">
-                    <i class="fas fa-users"></i> V-PeSDI PLWDs Database
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
+                    <img src="{{ asset('images/vpesdilogo.jpg') }}" alt="V-PeSDI Logo" style="height: 40px; margin-right: 10px;">
+                    <span>V-PeSDI PLWDs Database</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
